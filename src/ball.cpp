@@ -74,6 +74,11 @@ void Ball::reset_ball() {
   speed_y *= speed_choices[GetRandomValue(0, 1)];
 }
 
+void Ball::reset_scores() {
+  player_score = 0;
+  cpu_score = 0;
+}
+
 // Destructor
 Ball::~Ball() {
   std::cout << "Ball destructor\n";

@@ -64,10 +64,19 @@ int main()
           ball.change_x_direction();
           PlaySound(quack_sound);
         }
+
+        // If the cpu or player score passes the maximum score, then end the game
+        if (ball.get_cpu_score() >= 3 || ball.get_player_score() >= 3) {
+          current_screen = ending;
+        }
       } break;
 
       case ending: {
-
+        if (IsKeyPressed(KEY_SPACE)) {
+          // User pressed spacebar, so proceed to title on the next loop
+          current_screen = title;
+          ball.reset_scores();
+        }
       } break;
 
       default:
@@ -81,7 +90,8 @@ int main()
     switch (current_screen) {
       case title: {
         DrawText("Pong", 120, 120, 20, WHITE);
-        DrawText("Press the spacebar to begin...", 120, 220, 20, WHITE);
+        DrawText("First to 3 wins!", 120, 220, 20, WHITE);
+        DrawText("Press the spacebar to begin...", 120, 270, 20, WHITE);
       } break;
 
       case gameplay: {
@@ -95,7 +105,9 @@ int main()
       } break;
 
       case ending: {
-
+        DrawText("Game Over", 120, 120, 20, RED);
+        DrawText("Press the spacebar to return to the title screen", 120, 220, 20, WHITE);
+        DrawText("Press the escape key to close the game", 120, 270, 20, WHITE);
       } break;
 
       default:

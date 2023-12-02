@@ -26,5 +26,6 @@ class Ball {
     void draw();
     void update();
     void reset_ball();
+    void reset_scores();
     ~Ball();
 };

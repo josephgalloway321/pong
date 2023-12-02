@@ -1,18 +1,27 @@
+/*
+*
+*
+*/
+
+
 #include <iostream>
 #include <raylib.h>
 #include "../header/ball.hpp"
 #include "../header/paddle.hpp"
 #include "../header/cpu_paddle.hpp"
 
+typedef enum GameScreen {title, gameplay, ending} GameScreen;
+
 int main()
 {
   std::cout << "Starting the game...\n";
 
-  // Initialize the window
+  // Initialize the window & game screen
   const int SCREEN_WIDTH = 1280;
   const int SCREEN_HEIGHT = 800;
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Pong");
   SetTargetFPS(60);  // Determine how fast game will run (# of frames per second)
+  GameScreen current_screen = title;  // Start the game on the title screen
 
   // Initialize the game objects
   Ball ball(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 7, 7, 20);
@@ -30,36 +39,68 @@ int main()
   // Game Loop
   // If the esc key or close window icon is clicked, then the window will close
   while(WindowShouldClose() == false) {
-    BeginDrawing();  // Create a blank canvas to begin drawing game objects
-
     // Update
-    ball.update();
-    player.update();
-    cpu.update(ball.get_y());
-    UpdateMusicStream(music);
+    switch (current_screen) {
+      case title: {
+        if (IsKeyPressed(KEY_SPACE)) {
+          // User pressed spacebar, so proceed to gameplay on the next loop
+          current_screen = gameplay;
+        }
+      } break;
 
-    // Check for collisions between ball and paddles
-    if (CheckCollisionCircleRec(Vector2{ball.get_x(), ball.get_y()}, ball.get_radius(), Rectangle{player.get_x(), player.get_y(), player.get_width(), player.get_height()})) {
-      ball.change_x_direction();
-      PlaySound(quack_sound);
+      case gameplay: {
+        ball.update();
+        player.update();
+        cpu.update(ball.get_y());
+        UpdateMusicStream(music);
+
+        // Check for collisions between ball and paddles
+        if (CheckCollisionCircleRec(Vector2{ball.get_x(), ball.get_y()}, ball.get_radius(), Rectangle{player.get_x(), player.get_y(), player.get_width(), player.get_height()})) {
+          ball.change_x_direction();
+          PlaySound(quack_sound);
+        }
+
+        if (CheckCollisionCircleRec(Vector2{ball.get_x(), ball.get_y()}, ball.get_radius(), Rectangle{cpu.get_x(), cpu.get_y(), cpu.get_width(), cpu.get_height()})) {
+          ball.change_x_direction();
+          PlaySound(quack_sound);
+        }
+      } break;
+
+      case ending: {
+
+      } break;
+
+      default:
+        break;
     }
-    // TODO: Try renaming audio to SoundEffect
-
-    if (CheckCollisionCircleRec(Vector2{ball.get_x(), ball.get_y()}, ball.get_radius(), Rectangle{cpu.get_x(), cpu.get_y(), cpu.get_width(), cpu.get_height()})) {
-      ball.change_x_direction();
-      PlaySound(quack_sound);
-    }
-
+    
     // Draw game objects
-    ClearBackground(BLACK);
-    DrawLine(SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT, WHITE);  // Draw the center line dividing the two sides
-    ball.draw();  // Call draw method for ball
-    cpu.draw();
-    player.draw();  // Call draw method for player
+    BeginDrawing();  // Create a blank canvas to begin drawing game objects
+    ClearBackground(BLACK);  // Begin with a black screen
 
-    DrawText(TextFormat("%i", ball.get_cpu_score()), SCREEN_WIDTH/4 - 20, 20, 80, WHITE);  // Display CPU Score
-    DrawText(TextFormat("%i", ball.get_player_score()), 3*SCREEN_WIDTH/4 - 20, 20, 80, WHITE);  // Display player Score
+    switch (current_screen) {
+      case title: {
+        DrawText("Pong", 120, 120, 20, WHITE);
+        DrawText("Press the spacebar to begin...", 120, 220, 20, WHITE);
+      } break;
 
+      case gameplay: {
+        DrawLine(SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT, WHITE);  // Draw the center line dividing the two sides
+        ball.draw();  // Call draw method for ball
+        cpu.draw();
+        player.draw();  // Call draw method for player
+
+        DrawText(TextFormat("%i", ball.get_cpu_score()), SCREEN_WIDTH/4 - 20, 20, 80, WHITE);  // Display CPU Score
+        DrawText(TextFormat("%i", ball.get_player_score()), 3*SCREEN_WIDTH/4 - 20, 20, 80, WHITE);  // Display player Score
+      } break;
+
+      case ending: {
+
+      } break;
+
+      default:
+        break;
+    }
     EndDrawing();  // Ends the canvas drawing
   }
 

@@ -91,7 +91,8 @@ int main()
       case title: {
         DrawText("Pong", 120, 120, 20, WHITE);
         DrawText("First to 3 wins!", 120, 220, 20, WHITE);
-        DrawText("Press the spacebar to begin...", 120, 270, 20, WHITE);
+        DrawText("Use the up and down arrow keys to move your paddle.", 120, 270, 20, WHITE);
+        DrawText("Press the spacebar to begin...", 120, 320, 20, WHITE);
       } break;
 
       case gameplay: {
